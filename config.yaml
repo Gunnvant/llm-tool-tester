@@ -10,23 +10,15 @@
 #    Use 'gemma' for Gemma/ToolGemma models.
 
 models:
-#   gemma-3-1b-it:
-#     gguf_path: ./models/gemma-3-1b-it-q4_0.gguf
-#     port: 8080
-#     chat_template: gemma
-#     context_size: 4096
-  #   # server_binary: llama-server   # optional override if binary is not on PATH
-
-  # gemma-4-E2B:
-  #   gguf_path: ./models/gemma-4-E2B-it-Q8_0.gguf
-  #   port: 8089
-  #   chat_template: gemma
-  #   context_size: 4096
-
-  qwen2.5-3b-it:
-    gguf_path: ./models/qwen2.5-3b-instruct-q4_0.gguf
-    port: 8082
+  gemma-4-E2B-it-Q4-NL:
+    gguf_path: ./models/gemma-4-E2B-it-IQ4_NL.gguf
+    port: 8080
     context_size: 4096
+
+  # qwen2.5-3b-it:
+  #   gguf_path: ./models/qwen2.5-3b-instruct-q4_0.gguf
+  #   port: 8082
+  #   context_size: 4096
 
 
 #  qwen2.5-1.5b-it:

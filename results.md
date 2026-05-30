@@ -1,8 +1,8 @@
 # Tool Calling Evaluation Results
 
-Generated: 2026-05-30T21:59:05.715253
+Generated: 2026-05-30T22:46:55.827166
 
-## Model: `qwen2.5-3b-it`
+## Model: `gemma-4-E2B-it-Q4-NL`
 - **Total Tests:** 4
 - **Passed:** 4
 - **Failed:** 0
