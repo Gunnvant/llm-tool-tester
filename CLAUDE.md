@@ -67,7 +67,7 @@ The framework has four conceptual layers that are deliberately thin:
    - The `--jinja` flag is **required** for tool calling to work.
 
 2. **Client Layer (`client.py`)**
-   - `LlamaClient` is a thin `requests.post` wrapper to `/v1/chat/completions`.
+   - `LlamaClient` is a thin wrapper around the official `openai` client for `/v1/chat/completions`.
    - Auto-injects a system message when tools are present but no system message exists in the conversation.
    - Exposes `last_payload` for debugging/logging.
 

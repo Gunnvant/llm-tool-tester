@@ -16,49 +16,57 @@
           "argument_accuracy": 1.0
         },
         "raw_response": {
+          "id": "chatcmpl-dG16FkMyTD9LEPodretvE7gvd0LxswOC",
           "choices": [
             {
               "finish_reason": "tool_calls",
               "index": 0,
+              "logprobs": null,
               "message": {
-                "role": "assistant",
                 "content": "",
+                "refusal": null,
+                "role": "assistant",
+                "annotations": null,
+                "audio": null,
+                "function_call": null,
                 "tool_calls": [
                   {
-                    "type": "function",
+                    "id": "sGvjZxOwC8SELV2nvExjviRkgD4ABwKl",
                     "function": {
-                      "name": "get_weather",
-                      "arguments": "{\"city\": \"Tokyo\", \"unit\": \"celsius\"}"
+                      "arguments": "{\"city\": \"Tokyo\", \"unit\": \"celsius\"}",
+                      "name": "get_weather"
                     },
-                    "id": "pyHpm3mUMaKixGFNOknhnl0G2yLMhfcj"
+                    "type": "function"
                   }
                 ]
               }
             }
           ],
-          "created": 1779422365,
+          "created": 1780158539,
           "model": "qwen2.5-3b-instruct-q4_0.gguf",
-          "system_fingerprint": "b9260-3a6db741a",
           "object": "chat.completion",
+          "service_tier": null,
+          "system_fingerprint": "b9260-3a6db741a",
           "usage": {
             "completion_tokens": 28,
             "prompt_tokens": 229,
             "total_tokens": 257,
+            "completion_tokens_details": null,
             "prompt_tokens_details": {
+              "audio_tokens": null,
               "cached_tokens": 0
             }
           },
-          "id": "chatcmpl-JyBWhuqajh8AeorIvwTn4ujxnFko7isF",
           "timings": {
             "cache_n": 0,
             "prompt_n": 229,
-            "prompt_ms": 760.923,
-            "prompt_per_token_ms": 3.322807860262009,
-            "prompt_per_second": 300.95029326226177,
+            "prompt_ms": 858.224,
+            "prompt_per_token_ms": 3.747703056768559,
+            "prompt_per_second": 266.8301049609426,
             "predicted_n": 28,
-            "predicted_ms": 967.669,
-            "predicted_per_token_ms": 34.55960714285714,
-            "predicted_per_second": 28.93551410657983
+            "predicted_ms": 1000.382,
+            "predicted_per_token_ms": 35.72792857142857,
+            "predicted_per_second": 27.989308084311794
           }
         }
       },
@@ -74,57 +82,65 @@
           "tool 'get_weather' has extra keys: ['unit']"
         ],
         "raw_response": {
+          "id": "chatcmpl-hZPHDiWnmZeqaWWgMpcGnFNN4sQOzpBA",
           "choices": [
             {
               "finish_reason": "tool_calls",
               "index": 0,
+              "logprobs": null,
               "message": {
-                "role": "assistant",
                 "content": "",
+                "refusal": null,
+                "role": "assistant",
+                "annotations": null,
+                "audio": null,
+                "function_call": null,
                 "tool_calls": [
                   {
-                    "type": "function",
+                    "id": "ZEaXyqJ3SZ57qPxPAu813hUAPAsJKEc3",
                     "function": {
-                      "name": "calculator",
-                      "arguments": "{\"expression\": \"2+2\"}"
+                      "arguments": "{\"expression\": \"2+2\"}",
+                      "name": "calculator"
                     },
-                    "id": "Zy1z8Uy0rkegIsyEomFjNyLWnzUHhMZ5"
+                    "type": "function"
                   },
                   {
-                    "type": "function",
+                    "id": "HmtM13nXM9XxunajiYBbSeAtl9WdLhL7",
                     "function": {
-                      "name": "get_weather",
-                      "arguments": "{\"city\": \"Paris\", \"unit\": \"celsius\"}"
+                      "arguments": "{\"city\": \"Paris\", \"unit\": \"celsius\"}",
+                      "name": "get_weather"
                     },
-                    "id": "nPtEcbIzzci5p3brYnIdP2BMnObkCpY9"
+                    "type": "function"
                   }
                 ]
               }
             }
           ],
-          "created": 1779422368,
+          "created": 1780158542,
           "model": "qwen2.5-3b-instruct-q4_0.gguf",
-          "system_fingerprint": "b9260-3a6db741a",
           "object": "chat.completion",
+          "service_tier": null,
+          "system_fingerprint": "b9260-3a6db741a",
           "usage": {
             "completion_tokens": 48,
             "prompt_tokens": 294,
             "total_tokens": 342,
+            "completion_tokens_details": null,
             "prompt_tokens_details": {
+              "audio_tokens": null,
               "cached_tokens": 83
             }
           },
-          "id": "chatcmpl-lC052dX4SUBGb9SXcllLO61E2bvfMXUA",
           "timings": {
             "cache_n": 83,
             "prompt_n": 211,
-            "prompt_ms": 659.047,
-            "prompt_per_token_ms": 3.123445497630332,
-            "prompt_per_second": 320.1592602652011,
+            "prompt_ms": 668.605,
+            "prompt_per_token_ms": 3.168744075829384,
+            "prompt_per_second": 315.58244404394225,
             "predicted_n": 48,
-            "predicted_ms": 1706.953,
-            "predicted_per_token_ms": 35.56152083333333,
-            "predicted_per_second": 28.120282163597942
+            "predicted_ms": 1733.4,
+            "predicted_per_token_ms": 36.112500000000004,
+            "predicted_per_second": 27.69124264451367
           }
         }
       },
@@ -136,39 +152,48 @@
           "content_keywords": true
         },
         "raw_response": {
+          "id": "chatcmpl-WUwqOK93csTALCzYQ5H1gR2KLO499Jad",
           "choices": [
             {
               "finish_reason": "stop",
               "index": 0,
+              "logprobs": null,
               "message": {
+                "content": "Hello! I'm just a program, I don't have feelings. How can I assist you today?",
+                "refusal": null,
                 "role": "assistant",
-                "content": "Hello! I'm just a program, I don't have feelings. How can I assist you today?"
+                "annotations": null,
+                "audio": null,
+                "function_call": null,
+                "tool_calls": null
               }
             }
           ],
-          "created": 1779422369,
+          "created": 1780158542,
           "model": "qwen2.5-3b-instruct-q4_0.gguf",
-          "system_fingerprint": "b9260-3a6db741a",
           "object": "chat.completion",
+          "service_tier": null,
+          "system_fingerprint": "b9260-3a6db741a",
           "usage": {
             "completion_tokens": 22,
             "prompt_tokens": 226,
             "total_tokens": 248,
+            "completion_tokens_details": null,
             "prompt_tokens_details": {
+              "audio_tokens": null,
               "cached_tokens": 213
             }
           },
-          "id": "chatcmpl-GwHY3PupEydNfcwQT7t7GKmnQbja3GgN",
           "timings": {
             "cache_n": 213,
             "prompt_n": 13,
-            "prompt_ms": 111.373,
-            "prompt_per_token_ms": 8.567153846153847,
-            "prompt_per_second": 116.72487945911486,
+            "prompt_ms": 112.89,
+            "prompt_per_token_ms": 8.683846153846154,
+            "prompt_per_second": 115.15634688634954,
             "predicted_n": 22,
-            "predicted_ms": 727.503,
-            "predicted_per_token_ms": 33.068318181818185,
-            "predicted_per_second": 30.240425125394673
+            "predicted_ms": 775.272,
+            "predicted_per_token_ms": 35.239636363636365,
+            "predicted_per_second": 28.37713731438772
           }
         }
       },
@@ -184,57 +209,65 @@
           "tool 'search_web' has extra keys: ['num_results']"
         ],
         "raw_response": {
+          "id": "chatcmpl-nTXC5UZD3g4kVNtzjhh7FPk25LN1zQqg",
           "choices": [
             {
               "finish_reason": "tool_calls",
               "index": 0,
+              "logprobs": null,
               "message": {
-                "role": "assistant",
                 "content": "",
+                "refusal": null,
+                "role": "assistant",
+                "annotations": null,
+                "audio": null,
+                "function_call": null,
                 "tool_calls": [
                   {
-                    "type": "function",
+                    "id": "EOZ8nJmW4Sbi415RzNXWgHFsYZyDjmOn",
                     "function": {
-                      "name": "search_web",
-                      "arguments": "{\"query\": \"best Python IDE\", \"num_results\": 5}"
+                      "arguments": "{\"query\": \"best Python IDE\", \"num_results\": 5}",
+                      "name": "search_web"
                     },
-                    "id": "EAqHbR6lfNgo1AEm7mVlpdiAhQ4yYGMO"
+                    "type": "function"
                   },
                   {
-                    "type": "function",
+                    "id": "r31koSw360rbCLgJZfNcUP7cp6iqM1SD",
                     "function": {
-                      "name": "calculator",
-                      "arguments": "{\"expression\": \"10*5\"}"
+                      "arguments": "{\"expression\": \"10*5\"}",
+                      "name": "calculator"
                     },
-                    "id": "KBri2OZZ6UW3GYzAehKqe8vVYHqhQbWV"
+                    "type": "function"
                   }
                 ]
               }
             }
           ],
-          "created": 1779422371,
+          "created": 1780158545,
           "model": "qwen2.5-3b-instruct-q4_0.gguf",
-          "system_fingerprint": "b9260-3a6db741a",
           "object": "chat.completion",
+          "service_tier": null,
+          "system_fingerprint": "b9260-3a6db741a",
           "usage": {
             "completion_tokens": 51,
             "prompt_tokens": 292,
             "total_tokens": 343,
+            "completion_tokens_details": null,
             "prompt_tokens_details": {
+              "audio_tokens": null,
               "cached_tokens": 83
             }
           },
-          "id": "chatcmpl-vTdCwkZjJmechAr2VOXy8FXCsW6Pz170",
           "timings": {
             "cache_n": 83,
             "prompt_n": 209,
-            "prompt_ms": 660.342,
-            "prompt_per_token_ms": 3.159531100478469,
-            "prompt_per_second": 316.5026607424638,
+            "prompt_ms": 661.726,
+            "prompt_per_token_ms": 3.166153110047847,
+            "prompt_per_second": 315.8406953935617,
             "predicted_n": 51,
-            "predicted_ms": 1775.866,
-            "predicted_per_token_ms": 34.82090196078431,
-            "predicted_per_second": 28.718383031152122
+            "predicted_ms": 1782.267,
+            "predicted_per_token_ms": 34.946411764705886,
+            "predicted_per_second": 28.615241150736672
           }
         }
       }

@@ -26,7 +26,7 @@ A pure-Python framework that evaluates tool-calling capabilities of local LLMs s
    - Polls `/v1/models` until ready. Always stops servers on exit.
 
 2. **Client layer (`client.py`)**
-   - `LlamaClient` is a thin `requests.post` wrapper to `/v1/chat/completions`.
+    - `LlamaClient` is a thin wrapper around the official `openai` client for `/v1/chat/completions`.
    - Auto-injects a system message when tools are present but no system message exists in the conversation.
    - Exposes `last_payload` for debugging.
 

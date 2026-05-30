@@ -4,8 +4,8 @@ A pure-Python, zero-abstraction framework for testing tool-calling capabilities 
 
 ## Philosophy
 
-- **No wrappers**: Direct `requests` to `llama-server`'s OpenAI-compatible `/v1/chat/completions` endpoint.
-- **No heavy frameworks**: Just `function-schema`, `requests`, and `pyyaml`.
+- **No wrappers**: Direct `openai` client to `llama-server`'s OpenAI-compatible `/v1/chat/completions` endpoint.
+- **No heavy frameworks**: Just `openai`, `function-schema`, and `pyyaml`.
 - **Transparent evaluation**: You control the GGUFs, the chat templates, and the test cases.
 
 ## Quick Start

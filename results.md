@@ -1,6 +1,6 @@
 # Tool Calling Evaluation Results
 
-Generated: 2026-05-22T09:29:31.643773
+Generated: 2026-05-30T21:59:05.715253
 
 ## Model: `qwen2.5-3b-it`
 - **Total Tests:** 4
