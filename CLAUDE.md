@@ -37,8 +37,11 @@ llama-server --jinja -m ./models/<model>.gguf --port 8080 -c 4096 --chat-templat
 
 ### Install dependencies
 ```bash
-pip install -r requirements.txt
+uv sync
+source .venv/bin/activate
 ```
+
+After activation, you can run `python` commands directly.
 
 ### Run linters
 ```bash
@@ -51,7 +54,7 @@ python -m isort .
 python -m ruff format .
 ```
 
-> **Pre-commit hook:** `.git/hooks/pre-commit` automatically runs `isort`, `ruff` (check + format check), and `flake8` on staged Python files. If any check fails, the commit is blocked.
+> **Pre-commit hook:** `.git/hooks/pre-commit` automatically runs `isort`, `ruff` (check + format check), and `flake8` on staged Python files via `uv run`. If any check fails, the commit is blocked.
 
 ## High-Level Architecture
 

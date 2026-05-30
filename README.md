@@ -34,8 +34,13 @@ If none are found, a clear error is printed telling you to install llama.cpp or 
 
 ```bash
 cd llm-tool-tester
-pip install -r requirements.txt
+uv sync
+source .venv/bin/activate
 ```
+
+> `uv` manages dependencies from `pyproject.toml` and produces a
+> reproducible `uv.lock` file. After `uv sync`, activate the virtual
+> environment (`.venv`) so you can run `python` commands directly.
 
 ### 3. Configure your models
 

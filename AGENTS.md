@@ -51,7 +51,7 @@ A pure-Python framework that evaluates tool-calling capabilities of local LLMs s
 
 ## Linting & pre-commit
 
-- **Pre-commit hook** (`.git/hooks/pre-commit`) runs on staged Python files: `isort` (auto-fix) → `ruff format` (auto-fix) → `ruff check` → `flake8`. If any gate fails, the commit is blocked. Formatters auto-fix and re-add files.
+- **Pre-commit hook** (`.git/hooks/pre-commit`) runs on staged Python files: `isort` (auto-fix) → `ruff format` (auto-fix) → `ruff check` → `flake8`. Uses `uv run` so activation is not required. If any gate fails, the commit is blocked. Formatters auto-fix and re-add files.
 - **Config**: `pyproject.toml` (ruff, isort) and `.flake8`. Line length is **120**.
 
 ## Adding new test cases
