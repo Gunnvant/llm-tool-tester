@@ -224,3 +224,6 @@ __marimo__/
 *models/*
 *logs/*
 summary.md
+
+# claude files
+.claude 
