@@ -1,0 +1,35 @@
+# Model registry for llama-server instances.
+# Each entry gets its own --port so you can test multiple models back-to-back.
+#
+# IMPORTANT:
+# 1. Update gguf_path to point to real GGUF files on your machine.
+# 2. Download GGUFs directly from HuggingFace (e.g. ggml-org/gemma-3-1b-it-GGUF).
+#    Ollama blob files CANNOT be used directly by llama.cpp.
+# 3. The server is started with --jinja so that tool_calls are enabled.
+# 4. chat_template maps to llama-server's built-in template names.
+#    Use 'gemma' for Gemma/ToolGemma models.
+
+models:
+#   gemma-3-1b-it:
+#     gguf_path: ./models/gemma-3-1b-it-q4_0.gguf
+#     port: 8080
+#     chat_template: gemma
+#     context_size: 4096
+  #   # server_binary: llama-server   # optional override if binary is not on PATH
+
+  # gemma-4-E2B:
+  #   gguf_path: ./models/gemma-4-E2B-it-Q8_0.gguf
+  #   port: 8089
+  #   chat_template: gemma
+  #   context_size: 4096
+
+  qwen2.5-3b-it:
+    gguf_path: ./models/qwen2.5-3b-instruct-q4_0.gguf
+    port: 8082
+    context_size: 4096
+
+
+#  qwen2.5-1.5b-it:
+#     gguf_path: ./models/qwen2.5-1.5b-instruct-q2_k.gguf
+#     port: 8082
+#     context_size: 4096

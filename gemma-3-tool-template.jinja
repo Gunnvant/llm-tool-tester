@@ -1,0 +1,36 @@
+{# Gemma 3 tool-aware Jinja chat template
+   Override the GGUF's built-in template to force tool rendering.
+   Place this file next to config.yaml and reference it via:
+       chat_template_file: gemma-3-tool-template.jinja
+   in your model's config.yaml entry.
+#}
+{{ bos_token }}{% for message in messages %}
+{% if message['role'] == 'user' %}
+<start_of_turn>user
+{% if loop.first and tools is defined and tools | length > 0 %}
+You are a helpful assistant with access to tools.
+
+Available tools:
+{% for tool in tools %}
+- {{ tool.function.name }}: {{ tool.function.description }}
+  Parameters: {{ tool.function.parameters | tojson }}
+{% endfor %}
+
+When you need to use a tool, respond exactly with:
+<call>name: <tool_name>
+arguments: <json_args></call>
+
+{% endif %}{{ message['content'] }}
+<end_of_turn>
+{% elif message['role'] == 'assistant' %}
+<start_of_turn>model
+{% if message.content is not none %}{{ message.content }}{% endif %}
+{% if 'tool_calls' in message and message.tool_calls %}{% for tc in message.tool_calls %}<call>name: {{ tc.function.name }}
+arguments: {{ tc.function.arguments }}</call>{% endfor %}{% endif %}
+<end_of_turn>
+{% elif message['role'] == 'tool' %}
+<start_of_turn>user
+<call_result>{{ message['content'] }}</call_result>
+<end_of_turn>
+{% endif %}
+{% endfor %}<start_of_turn>model

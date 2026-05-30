@@ -1,0 +1,243 @@
+{
+  "qwen2.5-3b-it": {
+    "summary": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "accuracy": 1.0
+    },
+    "results": [
+      {
+        "test_id": "simple_weather_01",
+        "passed": true,
+        "metrics": {
+          "function_name_accuracy": 1.0,
+          "hallucination": 1.0,
+          "argument_accuracy": 1.0
+        },
+        "raw_response": {
+          "choices": [
+            {
+              "finish_reason": "tool_calls",
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "",
+                "tool_calls": [
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "get_weather",
+                      "arguments": "{\"city\": \"Tokyo\", \"unit\": \"celsius\"}"
+                    },
+                    "id": "pyHpm3mUMaKixGFNOknhnl0G2yLMhfcj"
+                  }
+                ]
+              }
+            }
+          ],
+          "created": 1779422365,
+          "model": "qwen2.5-3b-instruct-q4_0.gguf",
+          "system_fingerprint": "b9260-3a6db741a",
+          "object": "chat.completion",
+          "usage": {
+            "completion_tokens": 28,
+            "prompt_tokens": 229,
+            "total_tokens": 257,
+            "prompt_tokens_details": {
+              "cached_tokens": 0
+            }
+          },
+          "id": "chatcmpl-JyBWhuqajh8AeorIvwTn4ujxnFko7isF",
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 229,
+            "prompt_ms": 760.923,
+            "prompt_per_token_ms": 3.322807860262009,
+            "prompt_per_second": 300.95029326226177,
+            "predicted_n": 28,
+            "predicted_ms": 967.669,
+            "predicted_per_token_ms": 34.55960714285714,
+            "predicted_per_second": 28.93551410657983
+          }
+        }
+      },
+      {
+        "test_id": "parallel_search_01",
+        "passed": true,
+        "metrics": {
+          "function_name_accuracy": 1.0,
+          "hallucination": 1.0,
+          "argument_accuracy": 1.0
+        },
+        "warnings": [
+          "tool 'get_weather' has extra keys: ['unit']"
+        ],
+        "raw_response": {
+          "choices": [
+            {
+              "finish_reason": "tool_calls",
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "",
+                "tool_calls": [
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "calculator",
+                      "arguments": "{\"expression\": \"2+2\"}"
+                    },
+                    "id": "Zy1z8Uy0rkegIsyEomFjNyLWnzUHhMZ5"
+                  },
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "get_weather",
+                      "arguments": "{\"city\": \"Paris\", \"unit\": \"celsius\"}"
+                    },
+                    "id": "nPtEcbIzzci5p3brYnIdP2BMnObkCpY9"
+                  }
+                ]
+              }
+            }
+          ],
+          "created": 1779422368,
+          "model": "qwen2.5-3b-instruct-q4_0.gguf",
+          "system_fingerprint": "b9260-3a6db741a",
+          "object": "chat.completion",
+          "usage": {
+            "completion_tokens": 48,
+            "prompt_tokens": 294,
+            "total_tokens": 342,
+            "prompt_tokens_details": {
+              "cached_tokens": 83
+            }
+          },
+          "id": "chatcmpl-lC052dX4SUBGb9SXcllLO61E2bvfMXUA",
+          "timings": {
+            "cache_n": 83,
+            "prompt_n": 211,
+            "prompt_ms": 659.047,
+            "prompt_per_token_ms": 3.123445497630332,
+            "prompt_per_second": 320.1592602652011,
+            "predicted_n": 48,
+            "predicted_ms": 1706.953,
+            "predicted_per_token_ms": 35.56152083333333,
+            "predicted_per_second": 28.120282163597942
+          }
+        }
+      },
+      {
+        "test_id": "refusal_greeting_01",
+        "passed": true,
+        "metrics": {
+          "refusal_correctness": 1.0,
+          "content_keywords": true
+        },
+        "raw_response": {
+          "choices": [
+            {
+              "finish_reason": "stop",
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "Hello! I'm just a program, I don't have feelings. How can I assist you today?"
+              }
+            }
+          ],
+          "created": 1779422369,
+          "model": "qwen2.5-3b-instruct-q4_0.gguf",
+          "system_fingerprint": "b9260-3a6db741a",
+          "object": "chat.completion",
+          "usage": {
+            "completion_tokens": 22,
+            "prompt_tokens": 226,
+            "total_tokens": 248,
+            "prompt_tokens_details": {
+              "cached_tokens": 213
+            }
+          },
+          "id": "chatcmpl-GwHY3PupEydNfcwQT7t7GKmnQbja3GgN",
+          "timings": {
+            "cache_n": 213,
+            "prompt_n": 13,
+            "prompt_ms": 111.373,
+            "prompt_per_token_ms": 8.567153846153847,
+            "prompt_per_second": 116.72487945911486,
+            "predicted_n": 22,
+            "predicted_ms": 727.503,
+            "predicted_per_token_ms": 33.068318181818185,
+            "predicted_per_second": 30.240425125394673
+          }
+        }
+      },
+      {
+        "test_id": "multiple_dependent_01",
+        "passed": true,
+        "metrics": {
+          "function_name_accuracy": 1.0,
+          "hallucination": 1.0,
+          "argument_accuracy": 1.0
+        },
+        "warnings": [
+          "tool 'search_web' has extra keys: ['num_results']"
+        ],
+        "raw_response": {
+          "choices": [
+            {
+              "finish_reason": "tool_calls",
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "",
+                "tool_calls": [
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "search_web",
+                      "arguments": "{\"query\": \"best Python IDE\", \"num_results\": 5}"
+                    },
+                    "id": "EAqHbR6lfNgo1AEm7mVlpdiAhQ4yYGMO"
+                  },
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "calculator",
+                      "arguments": "{\"expression\": \"10*5\"}"
+                    },
+                    "id": "KBri2OZZ6UW3GYzAehKqe8vVYHqhQbWV"
+                  }
+                ]
+              }
+            }
+          ],
+          "created": 1779422371,
+          "model": "qwen2.5-3b-instruct-q4_0.gguf",
+          "system_fingerprint": "b9260-3a6db741a",
+          "object": "chat.completion",
+          "usage": {
+            "completion_tokens": 51,
+            "prompt_tokens": 292,
+            "total_tokens": 343,
+            "prompt_tokens_details": {
+              "cached_tokens": 83
+            }
+          },
+          "id": "chatcmpl-vTdCwkZjJmechAr2VOXy8FXCsW6Pz170",
+          "timings": {
+            "cache_n": 83,
+            "prompt_n": 209,
+            "prompt_ms": 660.342,
+            "prompt_per_token_ms": 3.159531100478469,
+            "prompt_per_second": 316.5026607424638,
+            "predicted_n": 51,
+            "predicted_ms": 1775.866,
+            "predicted_per_token_ms": 34.82090196078431,
+            "predicted_per_second": 28.718383031152122
+          }
+        }
+      }
+    ]
+  }
+}
