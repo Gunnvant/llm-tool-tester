@@ -18,6 +18,22 @@ A pure-Python framework that evaluates tool-calling capabilities of local LLMs s
 | Run all linters | `python -m ruff check . && python -m flake8 --config .flake8 . && python -m isort --check-only --diff .` |
 | Auto-fix lint issues | `python -m ruff check . --fix && python -m isort . && python -m ruff format .` |
 
+### JupyterLab
+
+`notebooks/tool_calling_debug.ipynb` — interactive notebook for testing request structures against `llama-server`. One-time kernel registration:
+```bash
+python -m ipykernel install --name llm-tool-tester --display-name "Python (llm-tool-tester)" --user
+jupyter lab notebooks/
+```
+
+### JupyterLab
+
+`notebooks/tool_calling_debug.ipynb` — interactive notebook for testing request structures against `llama-server`. One-time kernel registration:
+```bash
+python -m ipykernel install --name llm-tool-tester --display-name "Python (llm-tool-tester)" --user
+jupyter lab notebooks/
+```
+
 ## Architecture (four thin layers)
 
 1. **Server layer (`server_manager.py`)**

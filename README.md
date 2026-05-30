@@ -42,6 +42,22 @@ source .venv/bin/activate
 > reproducible `uv.lock` file. After `uv sync`, activate the virtual
 > environment (`.venv`) so you can run `python` commands directly.
 
+### JupyterLab Debugging
+
+A debug notebook lives in `notebooks/tool_calling_debug.ipynb` for interactively testing tool-calling request structures.
+
+**One-time setup** (registers the project's venv as a Jupyter kernel):
+```bash
+source .venv/bin/activate
+python -m ipykernel install --name llm-tool-tester --display-name "Python (llm-tool-tester)" --user
+```
+
+**Launch:**
+```bash
+jupyter lab notebooks/
+```
+Then select **"Python (llm-tool-tester)"** from the kernel picker (top-right).
+
 ### 3. Configure your models
 
 Edit `config.yaml` and point each entry at a real GGUF file on disk.

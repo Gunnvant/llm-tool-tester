@@ -43,6 +43,19 @@ source .venv/bin/activate
 
 After activation, you can run `python` commands directly.
 
+### JupyterLab notebook for debugging
+`notebooks/tool_calling_debug.ipynb` starts a local `llama-server` and uses the raw `openai` client to experiment with request structures. Useful for figuring out why a specific model (e.g., Gemma) refuses to emit tool calls.
+
+**Register the kernel once:**
+```bash
+python -m ipykernel install --name llm-tool-tester --display-name "Python (llm-tool-tester)" --user
+```
+
+**Launch:**
+```bash
+jupyter lab notebooks/
+```
+
 ### Run linters
 ```bash
 # Check all code
