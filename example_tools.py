@@ -2,9 +2,12 @@
 
 To add these to dataset.json, run:
     python add_test_case.py example_tools.py
+
+This module demonstrates both the traditional TestCase construction
+and the new TestCaseBuilder approach.
 """
 
-from schema_gen import TestCase, tool
+from schema_gen import TestCaseBuilder, tool
 
 
 @tool
@@ -33,68 +36,64 @@ DEFAULT_SYSTEM = (
 
 
 # ---------------------------------------------------------------------------
-# Test cases that will be discovered by add_test_case.py
+# Test cases using TestCaseBuilder (recommended approach)
 # ---------------------------------------------------------------------------
 
-simple_weather = TestCase(
-    id="simple_weather_01",
-    category="simple",
-    description="Basic single tool call",
-    system_message=DEFAULT_SYSTEM,
-    messages=[{"role": "user", "content": "What is the weather like in Tokyo in celsius?"}],
-    tools=[get_weather],
-    expected={
-        "should_call_tools": True,
-        "tool_calls": [{"name": "get_weather", "arguments": {"city": "Tokyo", "unit": "celsius"}}],
-    },
-    evaluation_notes="Model must call get_weather with city and unit.",
+simple_weather = (
+    TestCaseBuilder()
+    .id("simple_weather_01")
+    .category("simple")
+    .description("Basic single tool call with required + optional arg")
+    .system_message(DEFAULT_SYSTEM)
+    .user_message("What is the weather like in Tokyo in celsius?")
+    .add_tool(get_weather)
+    .expect_tool_call(get_weather, city="Tokyo", unit="celsius")
+    .evaluation_notes("Model must call get_weather. The user explicitly asks for celsius, so unit must be present.")
+    .build()
 )
 
-parallel_search = TestCase(
-    id="parallel_search_01",
-    category="parallel",
-    description="Two independent tool calls in one turn",
-    system_message=DEFAULT_SYSTEM,
-    messages=[{"role": "user", "content": "Calculate 2+2 and also get the weather in Paris."}],
-    tools=[calculator, get_weather],
-    expected={
-        "should_call_tools": True,
-        "tool_calls": [
-            {"name": "calculator", "arguments": {"expression": "2+2"}},
-            {"name": "get_weather", "arguments": {"city": "Paris"}},
-        ],
-    },
-    evaluation_notes="Order does not matter. Both calls must be present.",
+parallel_search = (
+    TestCaseBuilder()
+    .id("parallel_search_01")
+    .category("parallel")
+    .description("Two independent tool calls in one turn")
+    .system_message(DEFAULT_SYSTEM)
+    .user_message("Calculate 2+2 and also get the weather in Paris.")
+    .add_tool(calculator)
+    .add_tool(get_weather)
+    .expect_tool_call(calculator, expression="2+2")
+    .expect_tool_call(get_weather, city="Paris")
+    .evaluation_notes(
+        "Order of tool_calls does not matter. Both must be present. "
+        "The user did not specify a temperature unit, so unit is optional."
+    )
+    .build()
 )
 
-multiple_dependent = TestCase(
-    id="multiple_dependent_01",
-    category="multiple",
-    description="Sequential dependent calls in one turn",
-    system_message=DEFAULT_SYSTEM,
-    messages=[{"role": "user", "content": "Search the web for 'best Python IDE' and then calculate 10*5."}],
-    tools=[search_web, calculator],
-    expected={
-        "should_call_tools": True,
-        "tool_calls": [
-            {"name": "search_web", "arguments": {"query": "best Python IDE"}},
-            {"name": "calculator", "arguments": {"expression": "10*5"}},
-        ],
-    },
-    evaluation_notes="Both calls must be present.",
+multiple_dependent = (
+    TestCaseBuilder()
+    .id("multiple_dependent_01")
+    .category("multiple")
+    .description("Sequential dependent calls (A then B, simulated in one turn)")
+    .system_message(DEFAULT_SYSTEM)
+    .user_message("Search the web for 'best Python IDE' and then calculate 10*5.")
+    .add_tool(search_web)
+    .add_tool(calculator)
+    .expect_tool_call(search_web, query="best Python IDE")
+    .expect_tool_call(calculator, expression="10*5")
+    .evaluation_notes("Both calls must be present. The user did not specify num_results, so it is optional.")
+    .build()
 )
 
-refusal_greeting = TestCase(
-    id="refusal_greeting_01",
-    category="refusal",
-    description="Model should not call tools",
-    system_message=DEFAULT_SYSTEM,
-    messages=[{"role": "user", "content": "Hello! How are you doing today?"}],
-    tools=[get_weather],
-    expected={
-        "should_call_tools": False,
-        "tool_calls": [],
-        "content_must_contain": ["hello", "hi", "how are you"],
-    },
-    evaluation_notes="Model must respond conversationally without calling tools.",
+refusal_greeting = (
+    TestCaseBuilder()
+    .id("refusal_greeting_01")
+    .category("refusal")
+    .description("No tool needed; model should answer directly")
+    .system_message(DEFAULT_SYSTEM)
+    .user_message("Hello! How are you doing today?")
+    .add_tool(get_weather)
+    .expect_refusal("hello", "hi", "how are you")
+    .evaluation_notes("Model must refuse to call tools and respond conversationally.")
+    .build()
 )

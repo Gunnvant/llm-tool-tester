@@ -15,6 +15,41 @@ def load_module(module_path: str):
     return mod
 
 
+def ingest_cases(cases: list, dataset_path: str = "dataset.json", overwrite: bool = False) -> tuple:
+    """Ingest TestCase objects into dataset.json.
+
+    Returns:
+        tuple: (added_count, skipped_count)
+    """
+    if os.path.exists(dataset_path):
+        with open(dataset_path) as f:
+            dataset = json.load(f)
+    else:
+        dataset = {"test_cases": []}
+
+    existing_ids = {tc["id"] for tc in dataset["test_cases"]}
+    added = 0
+    skipped = 0
+
+    for case in cases:
+        case_dict = case.to_dict()
+        if case.id in existing_ids:
+            if overwrite:
+                dataset["test_cases"] = [tc for tc in dataset["test_cases"] if tc["id"] != case.id]
+                dataset["test_cases"].append(case_dict)
+                added += 1
+            else:
+                skipped += 1
+        else:
+            dataset["test_cases"].append(case_dict)
+            added += 1
+
+    with open(dataset_path, "w") as f:
+        json.dump(dataset, f, indent=2)
+
+    return added, skipped
+
+
 def main():
     parser = argparse.ArgumentParser(description="Ingest TestCase objects from a Python module into dataset.json")
     parser.add_argument("module", help="Python file containing TestCase definitions")
@@ -34,36 +69,23 @@ def main():
         print("No TestCase objects found in module.")
         return
 
-    if os.path.exists(args.dataset):
-        with open(args.dataset) as f:
-            dataset = json.load(f)
-    else:
-        dataset = {"test_cases": []}
-
-    existing_ids = {tc["id"] for tc in dataset["test_cases"]}
-    added = 0
-    skipped = 0
+    added, skipped = ingest_cases(cases, args.dataset, args.overwrite)
 
     for case in cases:
-        case_dict = case.to_dict()
-        if case.id in existing_ids:
+        with open(args.dataset) as f:
+            existing = {tc["id"] for tc in json.load(f)["test_cases"]}
+        if case.id in existing:
             if args.overwrite:
-                dataset["test_cases"] = [tc for tc in dataset["test_cases"] if tc["id"] != case.id]
-                dataset["test_cases"].append(case_dict)
                 print(f"Overwrote: {case.id}")
-                added += 1
             else:
-                print(f"Skipped (exists): {case.id}")
-                skipped += 1
+                print(f"Added: {case.id}")
         else:
-            dataset["test_cases"].append(case_dict)
-            print(f"Added: {case.id}")
-            added += 1
+            print(f"Skipped (exists): {case.id}")
 
-    with open(args.dataset, "w") as f:
-        json.dump(dataset, f, indent=2)
+    with open(args.dataset) as f:
+        total = len(json.load(f)["test_cases"])
 
-    print(f"\nDone. Added: {added}, Skipped: {skipped}. Total: {len(dataset['test_cases'])}")
+    print(f"\nDone. Added: {added}, Skipped: {skipped}. Total: {total}")
 
 
 if __name__ == "__main__":

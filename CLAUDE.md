@@ -30,6 +30,24 @@ python add_test_case.py my_test_cases.py
 python add_test_case.py my_test_cases.py --overwrite
 ```
 
+### Create test cases interactively
+```bash
+python create_test_case.py
+```
+
+### Create test cases with TestCaseBuilder (Python/Jupyter)
+```python
+from schema_gen import TestCaseBuilder
+test = (TestCaseBuilder()
+    .id("my_test_01")
+    .category("simple")
+    .user_message("What is the weather in Tokyo?")
+    .add_tool(get_weather)
+    .expect_tool_call(get_weather, city="Tokyo")
+    .build()
+)
+```
+
 ### Start llama-server manually for debugging
 ```bash
 llama-server --jinja -m ./models/<model>.gguf --port 8080 -c 4096 --chat-template <template>
@@ -43,8 +61,9 @@ source .venv/bin/activate
 
 After activation, you can run `python` commands directly.
 
-### JupyterLab notebook for debugging
-`notebooks/tool_calling_debug.ipynb` starts a local `llama-server` and uses the raw `openai` client to experiment with request structures. Useful for figuring out why a specific model (e.g., Gemma) refuses to emit tool calls.
+### JupyterLab notebooks
+- `notebooks/tool_calling_debug.ipynb` — Debugging tool-calling request structures against `llama-server`.
+- `notebooks/test_case_builder.ipynb` — Creating and previewing test cases with `TestCaseBuilder` and helpers.
 
 **Register the kernel once:**
 ```bash
@@ -85,9 +104,11 @@ The framework has four conceptual layers that are deliberately thin:
    - Exposes `last_payload` for debugging/logging.
 
 3. **Schema + TestCase Layer (`schema_gen.py`)**
-   - `tool` decorator: no-op marker for visually identifying tool functions.
-   - `get_tool_schema()`: Uses `function-schema` library to convert Python function signatures (type hints + docstrings) into OpenAI-compatible tool JSON schemas.
-   - `TestCase` class: Represents a single evaluation case with live callables for tools. `to_dict()` serializes to the JSON format expected by `dataset.json`.
+    - `tool` decorator: no-op marker for visually identifying tool functions.
+    - `get_tool_schema()`: Uses `function-schema` library to convert Python function signatures (type hints + docstrings) into OpenAI-compatible tool JSON schemas.
+    - `TestCase` class: Represents a single evaluation case with live callables for tools. `to_dict()` serializes to the JSON format expected by `dataset.json`.
+    - `TestCaseBuilder`: Fluent builder for constructing `TestCase` objects with a chainable API.
+    - Helper functions: `simple_test_case()`, `refusal_test_case()`, `parallel_test_case()` for common patterns.
 
 4. **Evaluation Layer (`evaluator.py`)**
    - `Evaluator` compares model responses to ground truth with exact-match scoring.
@@ -121,13 +142,49 @@ dataset.json (tests) ──→ client.py ──→ HTTP POST /v1/chat/completion
 | `evaluator.py` | `Evaluator` — exact-match scoring |
 | `run_tests.py` | Orchestrator: runs all tests, writes JSON/Markdown/JSONL logs |
 | `add_test_case.py` | Ingests `TestCase` objects from Python modules into `dataset.json` |
+| `create_test_case.py` | Interactive CLI wizard for creating test cases |
 | `debug_single.py` | Runs one test case against an already-running server |
 | `example_tools.py` | Example tool definitions and sample `TestCase` objects |
 | `gemma-3-tool-template.jinja` | Custom Jinja chat template for Gemma models |
 
 ## Adding New Test Cases
 
-Define tools as annotated Python functions decorated with `@tool`, and `TestCase` objects in a `.py` file:
+Define tools as annotated Python functions decorated with `@tool`, and `TestCase` objects in a `.py` file. You can use the `TestCaseBuilder` or helper functions for a more ergonomic experience:
+
+### Using TestCaseBuilder (recommended)
+
+```python
+from schema_gen import TestCaseBuilder
+from example_tools import get_weather, DEFAULT_SYSTEM
+
+test = (TestCaseBuilder()
+    .id("my_test_01")
+    .category("simple")
+    .user_message("What is the weather in Tokyo?")
+    .add_tool(get_weather)
+    .expect_tool_call(get_weather, city="Tokyo", unit="celsius")
+    .system_message(DEFAULT_SYSTEM)
+    .build()
+)
+```
+
+### Using helper functions
+
+```python
+from schema_gen import simple_test_case
+from example_tools import get_weather, DEFAULT_SYSTEM
+
+test = simple_test_case(
+    id="my_test_01",
+    category="simple",
+    question="What is the weather in Tokyo?",
+    tool_callable=get_weather,
+    expected_args={"city": "Tokyo", "unit": "celsius"},
+    system_message=DEFAULT_SYSTEM,
+)
+```
+
+### Traditional way (direct TestCase construction)
 
 ```python
 from schema_gen import tool, TestCase
@@ -155,6 +212,11 @@ my_test = TestCase(
 Then ingest:
 ```bash
 python add_test_case.py my_module.py
+```
+
+Or use the interactive CLI wizard:
+```bash
+python create_test_case.py
 ```
 
 ## Important Behavior Notes

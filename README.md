@@ -44,7 +44,10 @@ source .venv/bin/activate
 
 ### JupyterLab Debugging
 
-A debug notebook lives in `notebooks/tool_calling_debug.ipynb` for interactively testing tool-calling request structures.
+Two notebooks are available in the `notebooks/` directory:
+
+- **`tool_calling_debug.ipynb`** — Interactive debugging of tool-calling request structures against `llama-server`.
+- **`test_case_builder.ipynb`** — Create and preview test cases using `TestCaseBuilder` and helper functions.
 
 **One-time setup** (registers the project's venv as a Jupyter kernel):
 ```bash
@@ -92,6 +95,51 @@ The script will:
 
 - `results.json` — Full raw responses + per-metric scores.
 - `results.md` — Human-readable table (PASS/FAIL, function/argument accuracy, hallucination, refusal).
+
+## Creating Test Cases with TestCaseBuilder
+
+For a more ergonomic way to define test cases, use the `TestCaseBuilder` or helper functions:
+
+```python
+from schema_gen import TestCaseBuilder, simple_test_case
+from example_tools import get_weather, DEFAULT_SYSTEM
+
+# Using builder (fluent interface)
+test = (TestCaseBuilder()
+    .id("my_test_01")
+    .category("simple")
+    .user_message("What is the weather in Tokyo?")
+    .add_tool(get_weather)
+    .expect_tool_call(get_weather, city="Tokyo", unit="celsius")
+    .system_message(DEFAULT_SYSTEM)
+    .evaluation_notes("Model must include unit=celsius")
+    .build()
+)
+
+# Using helper (concise, single tool call)
+test = simple_test_case(
+    id="my_test_01",
+    category="simple",
+    question="What is the weather in Tokyo?",
+    tool_callable=get_weather,
+    expected_args={"city": "Tokyo", "unit": "celsius"},
+    system_message=DEFAULT_SYSTEM,
+)
+```
+
+### Interactive CLI
+
+Run the wizard to create test cases interactively:
+
+```bash
+python create_test_case.py
+```
+
+The wizard guides you through test ID, category, messages, tools, and expected behavior, then saves to a Python module you can ingest.
+
+### Jupyter Notebook
+
+The `notebooks/test_case_builder.ipynb` notebook provides an interactive environment for creating and previewing test cases with `TestCaseBuilder`.
 
 ## Adding / Removing Test Cases
 
@@ -159,6 +207,8 @@ A test case is marked **PASS** only when every metric is `1.0`.
 | `evaluator.py` | Exact-match scorer with refusal detection. |
 | `run_tests.py` | Orchestrator. Produces JSON + Markdown reports. |
 | `add_test_case.py` | Ingests `TestCase` objects from Python modules into `dataset.json`. |
+| `create_test_case.py` | Interactive CLI wizard for creating test cases. |
+| `example_tools.py` | Example tool definitions and sample `TestCase` objects. |
 
 ## Linting & Code Quality
 

@@ -1,193 +1,9 @@
 {
   "test_cases": [
     {
-      "id": "simple_weather_01",
-      "category": "simple",
-      "description": "Basic single tool call with required + optional arg",
-      "system_message": "You are a helpful assistant with access to tools. When a user asks something that requires a tool, you MUST call the appropriate tool using the provided function format.",
-      "messages": [
-        {
-          "role": "user",
-          "content": "What is the weather like in Tokyo in celsius?"
-        }
-      ],
-      "tools": [
-        {
-          "type": "function",
-          "function": {
-            "name": "get_weather",
-            "description": "Get the current weather for a given location.",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "city": {
-                  "type": "string",
-                  "description": "The city name"
-                },
-                "unit": {
-                  "type": "string",
-                  "description": "Temperature unit",
-                  "enum": [
-                    "celsius",
-                    "fahrenheit"
-                  ]
-                }
-              },
-              "required": [
-                "city"
-              ]
-            }
-          }
-        }
-      ],
-      "expected": {
-        "should_call_tools": true,
-        "tool_calls": [
-          {
-            "name": "get_weather",
-            "arguments": {
-              "city": "Tokyo",
-              "unit": "celsius"
-            }
-          }
-        ]
-      },
-      "evaluation_notes": "Model must call get_weather. The user explicitly asks for celsius, so unit must be present."
-    },
-    {
-      "id": "parallel_search_01",
-      "category": "parallel",
-      "description": "Two independent tool calls in one turn",
-      "system_message": "You are a helpful assistant with access to tools. When a user asks something that requires a tool, you MUST call the appropriate tool using the provided function format.",
-      "messages": [
-        {
-          "role": "user",
-          "content": "Calculate 2+2 and also get the weather in Paris."
-        }
-      ],
-      "tools": [
-        {
-          "type": "function",
-          "function": {
-            "name": "calculator",
-            "description": "Evaluate a mathematical expression.",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "expression": {
-                  "type": "string",
-                  "description": "Math expression to evaluate"
-                }
-              },
-              "required": [
-                "expression"
-              ]
-            }
-          }
-        },
-        {
-          "type": "function",
-          "function": {
-            "name": "get_weather",
-            "description": "Get the current weather for a given location.",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "city": {
-                  "type": "string",
-                  "description": "The city name"
-                },
-                "unit": {
-                  "type": "string",
-                  "description": "Temperature unit",
-                  "enum": [
-                    "celsius",
-                    "fahrenheit"
-                  ]
-                }
-              },
-              "required": [
-                "city"
-              ]
-            }
-          }
-        }
-      ],
-      "expected": {
-        "should_call_tools": true,
-        "tool_calls": [
-          {
-            "name": "calculator",
-            "arguments": {
-              "expression": "2+2"
-            }
-          },
-          {
-            "name": "get_weather",
-            "arguments": {
-              "city": "Paris"
-            }
-          }
-        ]
-      },
-      "evaluation_notes": "Order of tool_calls does not matter. Both must be present. The user did not specify a temperature unit, so unit is optional."
-    },
-    {
-      "id": "refusal_greeting_01",
-      "category": "refusal",
-      "description": "No tool needed; model should answer directly",
-      "system_message": "You are a helpful assistant with access to tools. When a user asks something that requires a tool, you MUST call the appropriate tool using the provided function format.",
-      "messages": [
-        {
-          "role": "user",
-          "content": "Hello! How are you doing today?"
-        }
-      ],
-      "tools": [
-        {
-          "type": "function",
-          "function": {
-            "name": "get_weather",
-            "description": "Get the current weather for a given location.",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "city": {
-                  "type": "string",
-                  "description": "The city name"
-                },
-                "unit": {
-                  "type": "string",
-                  "description": "Temperature unit",
-                  "enum": [
-                    "celsius",
-                    "fahrenheit"
-                  ]
-                }
-              },
-              "required": [
-                "city"
-              ]
-            }
-          }
-        }
-      ],
-      "expected": {
-        "should_call_tools": false,
-        "tool_calls": [],
-        "content_must_contain": [
-          "hello",
-          "hi",
-          "how are you"
-        ]
-      },
-      "evaluation_notes": "Model must refuse to call tools and respond conversationally."
-    },
-    {
       "id": "multiple_dependent_01",
       "category": "multiple",
       "description": "Sequential dependent calls (A then B, simulated in one turn)",
-      "system_message": "You are a helpful assistant with access to tools. When a user asks something that requires a tool, you MUST call the appropriate tool using the provided function format.",
       "messages": [
         {
           "role": "user",
@@ -205,11 +21,11 @@
               "properties": {
                 "query": {
                   "type": "string",
-                  "description": "Search query"
+                  "description": "The query parameter"
                 },
                 "num_results": {
-                  "type": "integer",
-                  "description": "Number of results",
+                  "type": "number",
+                  "description": "The num_results parameter",
                   "default": 5
                 }
               },
@@ -229,7 +45,7 @@
               "properties": {
                 "expression": {
                   "type": "string",
-                  "description": "Math expression to evaluate"
+                  "description": "The expression parameter"
                 }
               },
               "required": [
@@ -256,7 +72,182 @@
           }
         ]
       },
-      "evaluation_notes": "Both calls must be present. The user did not specify num_results, so it is optional."
+      "evaluation_notes": "Both calls must be present. The user did not specify num_results, so it is optional.",
+      "system_message": "You are a helpful assistant with access to tools. When a user asks something that requires a tool, you MUST call the appropriate tool using the provided function format."
+    },
+    {
+      "id": "parallel_search_01",
+      "category": "parallel",
+      "description": "Two independent tool calls in one turn",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Calculate 2+2 and also get the weather in Paris."
+        }
+      ],
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "calculator",
+            "description": "Evaluate a mathematical expression.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "string",
+                  "description": "The expression parameter"
+                }
+              },
+              "required": [
+                "expression"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_weather",
+            "description": "Get the current weather for a given location.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string",
+                  "description": "The city parameter"
+                },
+                "unit": {
+                  "type": "string",
+                  "description": "The unit parameter",
+                  "default": "celsius"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        }
+      ],
+      "expected": {
+        "should_call_tools": true,
+        "tool_calls": [
+          {
+            "name": "calculator",
+            "arguments": {
+              "expression": "2+2"
+            }
+          },
+          {
+            "name": "get_weather",
+            "arguments": {
+              "city": "Paris"
+            }
+          }
+        ]
+      },
+      "evaluation_notes": "Order of tool_calls does not matter. Both must be present. The user did not specify a temperature unit, so unit is optional.",
+      "system_message": "You are a helpful assistant with access to tools. When a user asks something that requires a tool, you MUST call the appropriate tool using the provided function format."
+    },
+    {
+      "id": "refusal_greeting_01",
+      "category": "refusal",
+      "description": "No tool needed; model should answer directly",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Hello! How are you doing today?"
+        }
+      ],
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_weather",
+            "description": "Get the current weather for a given location.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string",
+                  "description": "The city parameter"
+                },
+                "unit": {
+                  "type": "string",
+                  "description": "The unit parameter",
+                  "default": "celsius"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        }
+      ],
+      "expected": {
+        "should_call_tools": false,
+        "tool_calls": [],
+        "content_must_contain": [
+          "hello",
+          "hi",
+          "how are you"
+        ]
+      },
+      "evaluation_notes": "Model must refuse to call tools and respond conversationally.",
+      "system_message": "You are a helpful assistant with access to tools. When a user asks something that requires a tool, you MUST call the appropriate tool using the provided function format."
+    },
+    {
+      "id": "simple_weather_01",
+      "category": "simple",
+      "description": "Basic single tool call with required + optional arg",
+      "messages": [
+        {
+          "role": "user",
+          "content": "What is the weather like in Tokyo in celsius?"
+        }
+      ],
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_weather",
+            "description": "Get the current weather for a given location.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string",
+                  "description": "The city parameter"
+                },
+                "unit": {
+                  "type": "string",
+                  "description": "The unit parameter",
+                  "default": "celsius"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        }
+      ],
+      "expected": {
+        "should_call_tools": true,
+        "tool_calls": [
+          {
+            "name": "get_weather",
+            "arguments": {
+              "city": "Tokyo",
+              "unit": "celsius"
+            }
+          }
+        ]
+      },
+      "evaluation_notes": "Model must call get_weather. The user explicitly asks for celsius, so unit must be present.",
+      "system_message": "You are a helpful assistant with access to tools. When a user asks something that requires a tool, you MUST call the appropriate tool using the provided function format."
     }
   ]
 }

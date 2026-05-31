@@ -15,20 +15,19 @@ A pure-Python framework that evaluates tool-calling capabilities of local LLMs s
 | Debug one test (needs running server) | `python debug_single.py --model <name> --test-id <id>` |
 | Add test cases from Python module | `python add_test_case.py my_cases.py` |
 | Overwrite existing test IDs | `python add_test_case.py my_cases.py --overwrite` |
+| Create test case interactively | `python create_test_case.py` |
+| Create test cases with builder | `from schema_gen import TestCaseBuilder` |
+| JupyterLab (debug + test builder) | `jupyter lab notebooks/` |
 | Run all linters | `python -m ruff check . && python -m flake8 --config .flake8 . && python -m isort --check-only --diff .` |
 | Auto-fix lint issues | `python -m ruff check . --fix && python -m isort . && python -m ruff format .` |
 
 ### JupyterLab
 
-`notebooks/tool_calling_debug.ipynb` — interactive notebook for testing request structures against `llama-server`. One-time kernel registration:
-```bash
-python -m ipykernel install --name llm-tool-tester --display-name "Python (llm-tool-tester)" --user
-jupyter lab notebooks/
-```
+Two notebooks are available:
+- `notebooks/tool_calling_debug.ipynb` — interactive notebook for testing request structures against `llama-server`.
+- `notebooks/test_case_builder.ipynb` — create and preview test cases with `TestCaseBuilder`.
 
-### JupyterLab
-
-`notebooks/tool_calling_debug.ipynb` — interactive notebook for testing request structures against `llama-server`. One-time kernel registration:
+One-time kernel registration:
 ```bash
 python -m ipykernel install --name llm-tool-tester --display-name "Python (llm-tool-tester)" --user
 jupyter lab notebooks/
@@ -47,9 +46,11 @@ jupyter lab notebooks/
    - Exposes `last_payload` for debugging.
 
 3. **Schema + TestCase layer (`schema_gen.py`)**
-   - `tool` decorator: no-op marker for visually identifying tool functions.
-   - `get_tool_schema()`: Uses `function-schema` to convert annotated Python functions into OpenAI-compatible tool JSON schemas.
-   - `TestCase` class: Represents one evaluation case with live callables for tools. `to_dict()` serializes to the JSON format expected by `dataset.json`.
+    - `tool` decorator: no-op marker for visually identifying tool functions.
+    - `get_tool_schema()`: Uses `function-schema` to convert annotated Python functions into OpenAI-compatible tool JSON schemas.
+    - `TestCase` class: Represents one evaluation case with live callables for tools. `to_dict()` serializes to the JSON format expected by `dataset.json`.
+    - `TestCaseBuilder`: Fluent builder for constructing `TestCase` objects with a chainable API.
+    - Helper functions: `simple_test_case()`, `refusal_test_case()`, `parallel_test_case()` for common patterns.
 
 4. **Evaluation layer (`evaluator.py`)**
    - `Evaluator` compares model responses to ground truth with exact-match scoring.
@@ -76,6 +77,38 @@ Define tools as annotated Python functions decorated with `@tool`, and `TestCase
 
 ```bash
 python add_test_case.py my_module.py
+```
+
+For a more ergonomic experience, use `TestCaseBuilder` or helper functions:
+
+```python
+from schema_gen import TestCaseBuilder, simple_test_case
+from example_tools import get_weather, DEFAULT_SYSTEM
+
+# Using builder
+test = (TestCaseBuilder()
+    .id("my_test_01")
+    .category("simple")
+    .user_message("What is the weather in Tokyo?")
+    .add_tool(get_weather)
+    .expect_tool_call(get_weather, city="Tokyo")
+    .system_message(DEFAULT_SYSTEM)
+    .build()
+)
+
+# Using helper
+test = simple_test_case(
+    id="my_test_01",
+    category="simple",
+    question="What is the weather in Tokyo?",
+    tool_callable=get_weather,
+    expected_args={"city": "Tokyo"},
+)
+```
+
+You can also use the interactive CLI wizard:
+```bash
+python create_test_case.py
 ```
 
 See `example_tools.py` for a concrete example.
