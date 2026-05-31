@@ -13,8 +13,7 @@ A pure-Python framework that evaluates tool-calling capabilities of local LLMs s
 | Full evaluation suite | `python run_tests.py --config config.yaml --dataset dataset.json --output results.json` |
 | Run specific models only | `python run_tests.py --models qwen2.5-3b-it` |
 | Debug one test (needs running server) | `python debug_single.py --model <name> --test-id <id>` |
-| Add test cases from Python module | `python add_test_case.py my_cases.py` |
-| Overwrite existing test IDs | `python add_test_case.py my_cases.py --overwrite` |
+| Serialize test cases to dataset.json | `python test_cases.py` |
 | Create test case interactively | `python create_test_case.py` |
 | Create test cases with builder | `from schema_gen import TestCaseBuilder` |
 | JupyterLab (debug + test builder) | `jupyter lab notebooks/` |
@@ -45,12 +44,13 @@ jupyter lab notebooks/
    - Auto-injects a system message when tools are present but no system message exists in the conversation.
    - Exposes `last_payload` for debugging.
 
-3. **Schema + TestCase layer (`schema_gen.py`)**
-    - `tool` decorator: no-op marker for visually identifying tool functions.
-    - `get_tool_schema()`: Uses `function-schema` to convert annotated Python functions into OpenAI-compatible tool JSON schemas.
-    - `TestCase` class: Represents one evaluation case with live callables for tools. `to_dict()` serializes to the JSON format expected by `dataset.json`.
-    - `TestCaseBuilder`: Fluent builder for constructing `TestCase` objects with a chainable API.
-    - Helper functions: `simple_test_case()`, `refusal_test_case()`, `parallel_test_case()` for common patterns.
+3. **Schema + TestCase layer (`schema_gen.py` + `dataset.py`)**
+     - `tool` decorator: no-op marker for visually identifying tool functions.
+     - `get_tool_schema()`: Uses `function-schema` to convert annotated Python functions into OpenAI-compatible tool JSON schemas.
+     - `TestCase` class: Represents one evaluation case with tool schemas (dicts) for JSON serialization. `to_dict()` serializes to the JSON format expected by `dataset.json`.
+     - `TestCaseBuilder`: Fluent builder for constructing `TestCase` objects with a chainable API.
+     - Helper functions: `simple_test_case()`, `refusal_test_case()`, `parallel_test_case()` for common patterns.
+     - `Dataset` class (`dataset.py`): Manages test cases with CRUD operations and JSON serialization.
 
 4. **Evaluation layer (`evaluator.py`)**
    - `Evaluator` compares model responses to ground truth with exact-match scoring.
@@ -73,45 +73,54 @@ jupyter lab notebooks/
 
 ## Adding new test cases
 
-Define tools as annotated Python functions decorated with `@tool`, and `TestCase` objects in a `.py` file, then ingest:
+All test cases are defined in `test_cases.py` along with tool definitions. This file serves as the source of truth.
 
-```bash
-python add_test_case.py my_module.py
-```
-
-For a more ergonomic experience, use `TestCaseBuilder` or helper functions:
+### Using TestCaseBuilder (Recommended)
 
 ```python
-from schema_gen import TestCaseBuilder, simple_test_case
-from example_tools import get_weather, DEFAULT_SYSTEM
+from schema_gen import TestCaseBuilder, tool
 
-# Using builder
+@tool
+def my_tool(name: str, count: int = 1) -> str:
+    """Do something useful."""
+    pass
+
 test = (TestCaseBuilder()
     .id("my_test_01")
     .category("simple")
-    .user_message("What is the weather in Tokyo?")
-    .add_tool(get_weather)
-    .expect_tool_call(get_weather, city="Tokyo")
-    .system_message(DEFAULT_SYSTEM)
+    .user_message("Run my_tool with name=foo and count=5")
+    .add_tool(my_tool)
+    .expect_tool_call(my_tool, name="foo", count=5)
     .build()
-)
-
-# Using helper
-test = simple_test_case(
-    id="my_test_01",
-    category="simple",
-    question="What is the weather in Tokyo?",
-    tool_callable=get_weather,
-    expected_args={"city": "Tokyo"},
 )
 ```
 
-You can also use the interactive CLI wizard:
+### Serialize to dataset.json
+
+Run `test_cases.py` to serialize all test cases:
+```bash
+python test_cases.py
+```
+
+### Using Dataset class programmatically
+
+```python
+from dataset import Dataset
+from schema_gen import TestCaseBuilder
+
+dataset = Dataset()
+test = TestCaseBuilder().id("test_01").build()
+dataset.add(test)
+dataset.save()
+```
+
+### Interactive CLI
+
 ```bash
 python create_test_case.py
 ```
 
-See `example_tools.py` for a concrete example.
+See `test_cases.py` for a concrete example.
 
 ## Output artifacts
 

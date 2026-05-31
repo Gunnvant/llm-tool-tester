@@ -1,18 +1,25 @@
 """Interactive CLI wizard for creating test cases.
 
-Guides the user through creating a TestCase and saves it as a Python module
-that can be ingested with add_test_case.py.
+Guides the user through creating a TestCase and saves it directly
+to dataset.json using the Dataset class.
 """
 
-import importlib.util
 import inspect
 import json
 import os
 import sys
 
+# Add current directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from dataset import Dataset  # noqa: E402
+from schema_gen import TestCaseBuilder  # noqa: E402
+
 
 def load_module(module_path: str):
     """Load a Python module from file path."""
+    import importlib.util
+
     spec = importlib.util.spec_from_file_location("tool_module", module_path)
     mod = importlib.util.module_from_spec(spec)
     sys.modules["tool_module"] = mod
@@ -21,12 +28,11 @@ def load_module(module_path: str):
 
 
 def get_tool_functions(module):
-    """Get all @tool-decorated functions from a module."""
+    """Get all tool functions from a module."""
     tools = []
     for name in dir(module):
         obj = getattr(module, name)
         if callable(obj) and hasattr(obj, "__name__"):
-            # Check if it's a tool (has __doc__ and looks like a tool function)
             tools.append(obj)
     return tools
 
@@ -108,8 +114,13 @@ def main():
     print("  Test Case Creator - Interactive Wizard")
     print("=" * 60)
 
-    # Load existing dataset info
-    existing_ids, existing_categories = load_dataset()
+    # Load existing dataset
+    dataset = Dataset()
+    if os.path.exists("dataset.json"):
+        dataset.load()
+
+    existing_ids = {tc.id for tc in dataset.test_cases}
+    existing_categories = {tc.category for tc in dataset.test_cases}
 
     # Get test ID
     while True:
@@ -144,27 +155,26 @@ def main():
     user_message = prompt("User message (the test prompt)")
 
     # Load tools module
-    tools_module_path = prompt("Tools module path", default="example_tools.py", required=False)
+    tools_module_path = prompt("Tools module path", default="test_cases.py", required=False)
     if tools_module_path and os.path.exists(tools_module_path):
         tools_module = load_module(tools_module_path)
         tools = get_tool_functions(tools_module)
         if not tools:
-            print("No tool functions found in module. Using example_tools.py defaults.")
-            tools_module = load_module("example_tools.py")
-            tools = get_tool_functions(tools_module)
+            print("No tool functions found in module.")
+            tools = []
     else:
-        print("Tools module not found. Using example_tools.py.")
-        tools_module = load_module("example_tools.py")
-        tools = get_tool_functions(tools_module)
+        print("Tools module not found. Proceeding without tools.")
+        tools = []
 
     # Select tools
     selected_tools = []
-    print("\nSelect tools for this test case:")
-    while True:
-        tool = select_tool(tools)
-        selected_tools.append(tool)
-        if not prompt_bool("Add another tool?", False):
-            break
+    if tools:
+        print("\nSelect tools for this test case:")
+        while True:
+            tool = select_tool(tools)
+            selected_tools.append(tool)
+            if not prompt_bool("Add another tool?", False):
+                break
 
     # Expected behavior
     print("\nExpected behavior:")
@@ -196,63 +206,45 @@ def main():
     # Evaluation notes
     evaluation_notes = prompt("Evaluation notes (optional)", required=False)
 
-    # Generate Python code
+    # Build the test case
     print("\n" + "=" * 60)
-    print("Generated Python code:")
+    print("Building test case...")
     print("=" * 60)
 
-    code_lines = [
-        "from schema_gen import TestCaseBuilder",
-        f"from {tools_module.__name__} import {', '.join(t.__name__ for t in selected_tools)}",
-        "",
-        "test_case = (TestCaseBuilder()",
-        f'    .id("{test_id}")',
-        f'    .category("{category}")',
-    ]
+    builder = TestCaseBuilder()
+    builder.id(test_id).category(category)
     if description:
-        code_lines.append(f'    .description("{description}")')
+        builder.description(description)
     if system_message:
-        code_lines.append(f'    .system_message("""{system_message}""")')
-    code_lines.append(f'    .user_message("""{user_message}""")')
+        builder.system_message(system_message)
+    builder.user_message(user_message)
+
     for tool in selected_tools:
-        code_lines.append(f"    .add_tool({tool.__name__})")
+        builder.add_tool(tool)
+
     if expected_behavior == "tool_calls":
         for tool, args in expected_tool_calls:
-            args_str = ", ".join(f'{k}="{v}"' if isinstance(v, str) else f"{k}={v}" for k, v in args.items())
-            code_lines.append(f"    .expect_tool_call({tool.__name__}, {args_str})")
+            builder.expect_tool_call(tool, **args)
     else:
         if content_phrases:
-            phrases_str = ", ".join(f'"{p}"' for p in content_phrases)
-            code_lines.append(f"    .expect_refusal({phrases_str})")
+            builder.expect_refusal(*content_phrases)
+
     if evaluation_notes:
-        code_lines.append(f'    .evaluation_notes("""{evaluation_notes}""")')
-    code_lines.append("    .build()")
-    code_lines.append(")")
+        builder.evaluation_notes(evaluation_notes)
 
-    code = "\n".join(code_lines)
-    print(code)
-    print("=" * 60)
+    test_case = builder.build()
 
-    # Save to file
-    output_file = prompt("Save to file", default="user_test_cases.py")
-    with open(output_file, "w") as f:
-        f.write(code + "\n")
+    # Add to dataset
+    if test_id in existing_ids:
+        dataset.update(test_id, test_case)
+        print(f"Updated test case: {test_id}")
+    else:
+        dataset.add(test_case)
+        print(f"Added test case: {test_id}")
 
-    print(f"\nSaved to {output_file}")
-
-    # Option to ingest
-    if prompt_bool("\nIngest into dataset.json now?", True):
-        from add_test_case import ingest_cases
-
-        # Re-execute the saved module to get the TestCase object
-        mod = load_module(output_file)
-        cases = [obj for obj in vars(mod).values() if hasattr(obj, "to_dict")]
-        if cases:
-            added, skipped = ingest_cases(cases, "dataset.json", test_id in existing_ids)
-            print(f"Ingested: {added} added, {skipped} skipped.")
-        else:
-            print("No TestCase objects found in saved file.")
-
+    # Save to dataset.json
+    dataset.save()
+    print(f"\nSaved {len(dataset)} test cases to dataset.json")
     print("\nDone!")
 
 

@@ -24,9 +24,9 @@ def tool(func: Callable) -> Callable:
 class TestCase:
     """Represents a single evaluation case.
 
-    Tools are stored as live callables so that add_test_case.py can
-    auto-generate their JSON schemas.  to_dict() produces the plain
-    JSON representation that dataset.json expects.
+    Tools are stored as OpenAI-compatible schemas (dicts) so that
+    JSON serialization works directly. Use TestCaseBuilder to construct
+    instances from tool callables.
     """
 
     def __init__(
@@ -35,7 +35,7 @@ class TestCase:
         category: str,
         description: str,
         messages: list[dict],
-        tools: list[Callable],
+        tools: list[dict],  # CHANGED: Now expects schemas, not callables
         expected: dict,
         evaluation_notes: str = "",
         system_message: str = "",
@@ -44,18 +44,19 @@ class TestCase:
         self.category = category
         self.description = description
         self.messages = messages
-        self.tools = tools
+        self.tools = tools  # Store schemas directly
         self.expected = expected
         self.evaluation_notes = evaluation_notes
         self.system_message = system_message
 
     def to_dict(self) -> dict:
+        # Tools are already schemas, no conversion needed
         result = {
             "id": self.id,
             "category": self.category,
             "description": self.description,
             "messages": self.messages,
-            "tools": [get_tool_schema(t) for t in self.tools],
+            "tools": self.tools,  # Already schemas
             "expected": self.expected,
             "evaluation_notes": self.evaluation_notes,
         }
@@ -144,12 +145,15 @@ class TestCaseBuilder:
             if self._content_must_contain:
                 expected["content_must_contain"] = self._content_must_contain
 
+        # Convert tool callables to schemas
+        tool_schemas = [get_tool_schema(t) for t in self._tools]
+
         return TestCase(
             id=self._id,
             category=self._category,
             description=self._description,
             messages=self._messages,
-            tools=self._tools,
+            tools=tool_schemas,  # Store schemas, not callables
             expected=expected,
             evaluation_notes=self._evaluation_notes,
             system_message=self._system_message,

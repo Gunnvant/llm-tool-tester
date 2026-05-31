@@ -1,6 +1,6 @@
 # Tool Calling Evaluation Results
 
-Generated: 2026-05-30T22:46:55.827166
+Generated: 2026-05-31T10:11:12.893277
 
 ## Model: `gemma-4-E2B-it-Q4-NL`
 - **Total Tests:** 4
@@ -14,7 +14,7 @@ Generated: 2026-05-30T22:46:55.827166
 |---|---|:---:|:---:|:---:|:---:|:---|
 | simple_weather_01 | simple | PASS | 1.0 | 1.0 | 1.0 |  |
 | parallel_search_01 | parallel | PASS | 1.0 | 1.0 | 1.0 |  |
-| refusal_greeting_01 | refusal | PASS | - | - | 1.0 |  |
 | multiple_dependent_01 | multiple | PASS | 1.0 | 1.0 | 1.0 |  |
+| refusal_greeting_01 | refusal | PASS | - | - | 1.0 |  |
 
 ---

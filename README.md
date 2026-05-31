@@ -96,36 +96,53 @@ The script will:
 - `results.json` — Full raw responses + per-metric scores.
 - `results.md` — Human-readable table (PASS/FAIL, function/argument accuracy, hallucination, refusal).
 
-## Creating Test Cases with TestCaseBuilder
+## Defining Test Cases
 
-For a more ergonomic way to define test cases, use the `TestCaseBuilder` or helper functions:
+All test cases are defined in `test_cases.py` along with tool definitions. This single file serves as the source of truth for tools and test cases.
+
+### Using TestCaseBuilder (Recommended)
 
 ```python
-from schema_gen import TestCaseBuilder, simple_test_case
-from example_tools import get_weather, DEFAULT_SYSTEM
+from schema_gen import TestCaseBuilder, tool
 
-# Using builder (fluent interface)
+@tool
+def get_weather(city: str, unit: str = "celsius") -> str:
+    """Get the current weather for a given location."""
+    pass
+
 test = (TestCaseBuilder()
     .id("my_test_01")
     .category("simple")
     .user_message("What is the weather in Tokyo?")
     .add_tool(get_weather)
     .expect_tool_call(get_weather, city="Tokyo", unit="celsius")
-    .system_message(DEFAULT_SYSTEM)
-    .evaluation_notes("Model must include unit=celsius")
     .build()
 )
+```
 
-# Using helper (concise, single tool call)
+### Using Helper Functions
+
+```python
+from schema_gen import simple_test_case
+
 test = simple_test_case(
     id="my_test_01",
     category="simple",
     question="What is the weather in Tokyo?",
     tool_callable=get_weather,
     expected_args={"city": "Tokyo", "unit": "celsius"},
-    system_message=DEFAULT_SYSTEM,
 )
 ```
+
+### Serialize to dataset.json
+
+Run `test_cases.py` to serialize all test cases to `dataset.json`:
+
+```bash
+python test_cases.py
+```
+
+The file self-serializes when run as `__main__`.
 
 ### Interactive CLI
 
@@ -135,54 +152,35 @@ Run the wizard to create test cases interactively:
 python create_test_case.py
 ```
 
-The wizard guides you through test ID, category, messages, tools, and expected behavior, then saves to a Python module you can ingest.
+The wizard guides you through test ID, category, messages, tools, and expected behavior, then saves directly to `dataset.json`.
 
 ### Jupyter Notebook
 
 The `notebooks/test_case_builder.ipynb` notebook provides an interactive environment for creating and previewing test cases with `TestCaseBuilder`.
 
-## Adding / Removing Test Cases
+## Managing Test Cases
 
-### The easy way: Python definitions
-
-Write a `.py` file with annotated functions and `TestCase` objects:
+The `dataset.py` module provides a `Dataset` class for CRUD operations on `dataset.json`:
 
 ```python
-from schema_gen import tool, TestCase
+from dataset import Dataset
 
-@tool
-def my_tool(name: str, count: int = 1) -> str:
-    """Do something useful."""
-    pass
+# Load existing dataset
+dataset = Dataset()
+dataset.load()
 
-my_test = TestCase(
-    id="my_test_01",
-    category="simple",
-    description="...",
-    messages=[{"role": "user", "content": "Run my_tool with name=foo and count=5"}],
-    tools=[my_tool],
-    expected={
-        "should_call_tools": True,
-        "tool_calls": [
-            {"name": "my_tool", "arguments": {"name": "foo", "count": 5}}
-        ]
-    },
-)
+# List all test cases
+for tc in dataset.list():
+    print(tc.id)
+
+# Get a specific test case
+test = dataset.get("simple_weather_01")
+
+# Add/Update/Remove
+dataset.add(test_case, overwrite=True)
+dataset.remove("old_test_01")
+dataset.save()
 ```
-
-Then ingest it into `dataset.json`:
-
-```bash
-# Add new cases
-python add_test_case.py my_test_cases.py
-
-# Overwrite existing IDs
-python add_test_case.py my_test_cases.py --overwrite
-```
-
-### The manual way: edit JSON
-
-`dataset.json` is plain JSON. You can add, remove, or tweak test cases directly with any editor.
 
 ## Evaluation Metrics
 
@@ -201,14 +199,14 @@ A test case is marked **PASS** only when every metric is `1.0`.
 |---|---|
 | `config.yaml` | Model registry (GGUF path → port → chat template). |
 | `dataset.json` | Ground-truth test cases (prompts + expected tool calls). |
+| `test_cases.py` | Tool definitions and test case objects (source of truth). |
+| `dataset.py` | `Dataset` class for CRUD operations on `dataset.json`. |
 | `schema_gen.py` | `function-schema` wrapper: Python functions → OpenAI `tools` JSON. |
 | `server_manager.py` | Spawns/kills `llama-server --jinja` per model. |
 | `client.py` | Raw HTTP client for `/v1/chat/completions`. |
 | `evaluator.py` | Exact-match scorer with refusal detection. |
 | `run_tests.py` | Orchestrator. Produces JSON + Markdown reports. |
-| `add_test_case.py` | Ingests `TestCase` objects from Python modules into `dataset.json`. |
 | `create_test_case.py` | Interactive CLI wizard for creating test cases. |
-| `example_tools.py` | Example tool definitions and sample `TestCase` objects. |
 
 ## Linting & Code Quality
 

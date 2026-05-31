@@ -16,7 +16,7 @@
           "argument_accuracy": 1.0
         },
         "raw_response": {
-          "id": "chatcmpl-aUWPCFmMVHN93UyVC5izIkN89XSVelJY",
+          "id": "chatcmpl-ijffXvC1wyZTcxFtB6hFfkERBij1duyH",
           "choices": [
             {
               "finish_reason": "tool_calls",
@@ -31,7 +31,7 @@
                 "function_call": null,
                 "tool_calls": [
                   {
-                    "id": "jUlklxQvQdhkTJHJhxEDjjLHZBbTPNwm",
+                    "id": "ARlrlGDoYS1jMgNM3aZOKOSskVukhVjG",
                     "function": {
                       "arguments": "{\"city\":\"Tokyo\",\"unit\":\"celsius\"}",
                       "name": "get_weather"
@@ -39,19 +39,19 @@
                     "type": "function"
                   }
                 ],
-                "reasoning_content": "1.  **Analyze the user's request:** The user is asking for the weather in \"Tokyo\" and specifically wants the temperature in \"celsius\".\n\n2.  **Examine available tools:** The only tool available is `get_weather(city: STRING, unit: STRING)`.\n\n3.  **Determine the necessary arguments for the tool:**\n    *   `city`: The user specified \"Tokyo\".\n    *   `unit`: The user specified \"celsius\".\n\n4.  **Construct the tool call:** Based on the analysis, the correct tool call is `get_weather(city=\"Tokyo\", unit=\"celsius\")`.\n\n5.  **Format the output:** Generate the tool call in the required JSON format."
+                "reasoning_content": "1. **Analyze the user's request:** The user is asking for the weather in \"Tokyo\" and specifically wants the temperature in \"celsius\".\n\n2. **Examine available tools:** The only tool available is `get_weather(city: STRING, unit: STRING)`.\n\n3. **Determine the necessary arguments for the tool:**\n    *   `city`: The user specified \"Tokyo\".\n    *   `unit`: The user specified \"celsius\".\n\n4. **Construct the tool call:** Based on the analysis, the correct tool call is `get_weather(city=\"Tokyo\", unit=\"celsius\")`.\n\n5. **Format the output:** Generate the tool call in the required JSON format."
               }
             }
           ],
-          "created": 1780161392,
+          "created": 1780202450,
           "model": "gemma-4-E2B-it-IQ4_NL.gguf",
           "object": "chat.completion",
           "service_tier": null,
           "system_fingerprint": "b9260-3a6db741a",
           "usage": {
-            "completion_tokens": 181,
-            "prompt_tokens": 139,
-            "total_tokens": 320,
+            "completion_tokens": 176,
+            "prompt_tokens": 128,
+            "total_tokens": 304,
             "completion_tokens_details": null,
             "prompt_tokens_details": {
               "audio_tokens": null,
@@ -60,14 +60,14 @@
           },
           "timings": {
             "cache_n": 0,
-            "prompt_n": 139,
-            "prompt_ms": 657.872,
-            "prompt_per_token_ms": 4.732892086330935,
-            "prompt_per_second": 211.28730208916022,
-            "predicted_n": 181,
-            "predicted_ms": 5558.606,
-            "predicted_per_token_ms": 30.71053038674033,
-            "predicted_per_second": 32.562120790716236
+            "prompt_n": 128,
+            "prompt_ms": 356.67,
+            "prompt_per_token_ms": 2.786484375,
+            "prompt_per_second": 358.87515069952616,
+            "predicted_n": 176,
+            "predicted_ms": 5374.003,
+            "predicted_per_token_ms": 30.53410795454545,
+            "predicted_per_second": 32.7502608390803
           }
         }
       },
@@ -80,7 +80,7 @@
           "argument_accuracy": 1.0
         },
         "raw_response": {
-          "id": "chatcmpl-Zk5pOA6OenxaB2DtXSxatcyOCILWHEbN",
+          "id": "chatcmpl-VwBaTtzcMadljCWgdXT3flLj0O7tV5M9",
           "choices": [
             {
               "finish_reason": "tool_calls",
@@ -95,7 +95,7 @@
                 "function_call": null,
                 "tool_calls": [
                   {
-                    "id": "OlHPtkD4LFuKN762rs3F1XlHcmvNqvTV",
+                    "id": "0BVN6Rpn6ABCy828UJZEmDSBv0HtnmJP",
                     "function": {
                       "arguments": "{\"expression\":\"2+2\"}",
                       "name": "calculator"
@@ -103,7 +103,7 @@
                     "type": "function"
                   },
                   {
-                    "id": "PO1I1TjBl0wqvVOHvnvDDUKs69o9ba9h",
+                    "id": "ZOe1JmIPnS3HLp1UJtIV4omWXslxLfFQ",
                     "function": {
                       "arguments": "{\"city\":\"Paris\"}",
                       "name": "get_weather"
@@ -111,19 +111,19 @@
                     "type": "function"
                   }
                 ],
-                "reasoning_content": "1. **Analyze the user request:** The user has two distinct requests:\n    *   Calculate \"2+2\".\n    *   Get the weather in \"Paris\".\n\n2. **Identify necessary tools:**\n    *   To calculate \"2+2\", the `calculator` tool is needed.\n    *   To get the weather in \"Paris\", the `get_weather` tool is needed.\n\n3. **Determine the arguments for each tool:**\n    *   `calculator`: The expression is \"2+2\".\n    *   `get_weather`: The `city` is \"Paris\". The `unit` is not specified, so it will default or can be omitted if the tool handles defaults, but it's good practice to consider if a default is needed.\n\n4. **Construct the tool calls:**\n    *   Call 1: `calculator(expression=\"2+2\")`\n    *   Call 2: `get_weather(city=\"Paris\")`\n\n5. **Format the output:** The model should return both tool calls in a single response, as they are independent requests that can be executed concurrently.\n\n6. **Final Review:** The generated tool calls directly address both parts of the user's request."
+                "reasoning_content": "1. **Analyze the user request:** The user wants two things:\n    * Calculate `2 + 2`.\n    * Get the weather in `Paris`.\n\n2. **Examine available tools:**\n    * `calculator(expression: string)`: Can be used to calculate mathematical expressions.\n    * `get_weather(city: string, unit?: string)`: Can be used to get the weather for a given city.\n\n3. **Determine the necessary tool calls:**\n    * For \"Calculate 2+2\", I need to call `calculator` with the expression `\"2+2\"`.\n    * For \"get the weather in Paris\", I need to call `get_weather` with `city=\"Paris\"`.\n\n4. **Construct the tool calls:**\n    * Call 1: `calculator(expression=\"2+2\")`\n    * Call 2: `get_weather(city=\"Paris\")`\n\n5. **Format the output:** The model should return both tool calls in a single response if possible, as they are independent requests.\n\n6. **Final check:** The request is fully addressed by these two tool calls."
               }
             }
           ],
-          "created": 1780161402,
+          "created": 1780202459,
           "model": "gemma-4-E2B-it-IQ4_NL.gguf",
           "object": "chat.completion",
           "service_tier": null,
           "system_fingerprint": "b9260-3a6db741a",
           "usage": {
-            "completion_tokens": 295,
-            "prompt_tokens": 191,
-            "total_tokens": 486,
+            "completion_tokens": 277,
+            "prompt_tokens": 179,
+            "total_tokens": 456,
             "completion_tokens_details": null,
             "prompt_tokens_details": {
               "audio_tokens": null,
@@ -132,68 +132,14 @@
           },
           "timings": {
             "cache_n": 41,
-            "prompt_n": 150,
-            "prompt_ms": 426.909,
-            "prompt_per_token_ms": 2.84606,
-            "prompt_per_second": 351.36293683197124,
-            "predicted_n": 295,
-            "predicted_ms": 9181.063,
-            "predicted_per_token_ms": 31.122247457627118,
-            "predicted_per_second": 32.13135559575182
-          }
-        }
-      },
-      {
-        "test_id": "refusal_greeting_01",
-        "passed": true,
-        "metrics": {
-          "refusal_correctness": 1.0,
-          "content_keywords": false
-        },
-        "raw_response": {
-          "id": "chatcmpl-KITTCZLStOSuyZdTIGTyRpKasec57mZV",
-          "choices": [
-            {
-              "finish_reason": "stop",
-              "index": 0,
-              "logprobs": null,
-              "message": {
-                "content": "I'm doing well, thank you for asking! I'm ready to help you with whatever you need. How can I assist you today?",
-                "refusal": null,
-                "role": "assistant",
-                "annotations": null,
-                "audio": null,
-                "function_call": null,
-                "tool_calls": null,
-                "reasoning_content": "1.  **Analyze the user's request:** The user said, \"Hello! How are you doing today?\"\n2.  **Determine the user's intent:** The user is initiating a casual conversation and asking about my well-being.\n3.  **Check available tools:** The only available tool is `get_weather(city, unit)`.\n4.  **Evaluate tool relevance:** The request is a general social greeting/inquiry about well-being. It does not require fetching weather information.\n5.  **Formulate a response:** Since I am an AI, I should respond in a friendly and helpful manner, acknowledging the greeting and answering the implied question (how I am).\n6.  **Final Response Generation:** Generate a standard, positive conversational reply."
-              }
-            }
-          ],
-          "created": 1780161409,
-          "model": "gemma-4-E2B-it-IQ4_NL.gguf",
-          "object": "chat.completion",
-          "service_tier": null,
-          "system_fingerprint": "b9260-3a6db741a",
-          "usage": {
-            "completion_tokens": 198,
-            "prompt_tokens": 137,
-            "total_tokens": 335,
-            "completion_tokens_details": null,
-            "prompt_tokens_details": {
-              "audio_tokens": null,
-              "cached_tokens": 124
-            }
-          },
-          "timings": {
-            "cache_n": 124,
-            "prompt_n": 13,
-            "prompt_ms": 139.895,
-            "prompt_per_token_ms": 10.761153846153848,
-            "prompt_per_second": 92.92683798563208,
-            "predicted_n": 198,
-            "predicted_ms": 6188.975,
-            "predicted_per_token_ms": 31.257449494949498,
-            "predicted_per_second": 31.992373535197668
+            "prompt_n": 138,
+            "prompt_ms": 418.956,
+            "prompt_per_token_ms": 3.035913043478261,
+            "prompt_per_second": 329.39019849339786,
+            "predicted_n": 277,
+            "predicted_ms": 8493.472,
+            "predicted_per_token_ms": 30.662353790613718,
+            "predicted_per_second": 32.61328229492015
           }
         }
       },
@@ -206,7 +152,7 @@
           "argument_accuracy": 1.0
         },
         "raw_response": {
-          "id": "chatcmpl-PyL5paAqsShf6fu6OSGBrkzAv8JcNzdh",
+          "id": "chatcmpl-5HsEZjXYTAjXIuC7XdABXerltp4IJ4uc",
           "choices": [
             {
               "finish_reason": "tool_calls",
@@ -221,7 +167,7 @@
                 "function_call": null,
                 "tool_calls": [
                   {
-                    "id": "7U0uSP6hmBRuKzWjUZe5MOZxxusnAazn",
+                    "id": "xJfck64uou5wnT5vVAoDhtsdNXjyVm6q",
                     "function": {
                       "arguments": "{\"query\":\"best Python IDE\"}",
                       "name": "search_web"
@@ -229,7 +175,7 @@
                     "type": "function"
                   },
                   {
-                    "id": "Gilvb7u41zl6Hcs6e1Wx5xcozfkkgo5O",
+                    "id": "xTyR0lJAznKh6XHipOfvuqGaZaTfk3Z0",
                     "function": {
                       "arguments": "{\"expression\":\"10*5\"}",
                       "name": "calculator"
@@ -241,15 +187,15 @@
               }
             }
           ],
-          "created": 1780161415,
+          "created": 1780202465,
           "model": "gemma-4-E2B-it-IQ4_NL.gguf",
           "object": "chat.completion",
           "service_tier": null,
           "system_fingerprint": "b9260-3a6db741a",
           "usage": {
             "completion_tokens": 195,
-            "prompt_tokens": 184,
-            "total_tokens": 379,
+            "prompt_tokens": 186,
+            "total_tokens": 381,
             "completion_tokens_details": null,
             "prompt_tokens_details": {
               "audio_tokens": null,
@@ -258,14 +204,68 @@
           },
           "timings": {
             "cache_n": 41,
-            "prompt_n": 143,
-            "prompt_ms": 423.834,
-            "prompt_per_token_ms": 2.963874125874126,
-            "prompt_per_second": 337.3962447562017,
+            "prompt_n": 145,
+            "prompt_ms": 429.337,
+            "prompt_per_token_ms": 2.9609448275862067,
+            "prompt_per_second": 337.73003491429813,
             "predicted_n": 195,
-            "predicted_ms": 6045.494,
-            "predicted_per_token_ms": 31.002533333333332,
-            "predicted_per_second": 32.25542858863147
+            "predicted_ms": 5967.219,
+            "predicted_per_token_ms": 30.601123076923077,
+            "predicted_per_second": 32.67853919891326
+          }
+        }
+      },
+      {
+        "test_id": "refusal_greeting_01",
+        "passed": true,
+        "metrics": {
+          "refusal_correctness": 1.0,
+          "content_keywords": false
+        },
+        "raw_response": {
+          "id": "chatcmpl-GiZCm3RR2WS9ViFHq6Zd7tog10sp6fjf",
+          "choices": [
+            {
+              "finish_reason": "stop",
+              "index": 0,
+              "logprobs": null,
+              "message": {
+                "content": "I'm doing well, thank you for asking! I'm ready to help you with whatever you need today. How can I assist you?",
+                "refusal": null,
+                "role": "assistant",
+                "annotations": null,
+                "audio": null,
+                "function_call": null,
+                "tool_calls": null,
+                "reasoning_content": "1.  **Analyze the user's request:** The user said, \"Hello! How are you doing today?\"\n2.  **Determine the user's intent:** The user is initiating a casual greeting and asking about my well-being.\n3.  **Check available tools:** The only available tool is `get_weather(city, unit)`.\n4.  **Evaluate tool relevance:** The `get_weather` tool is for fetching weather information. It is not relevant to answering a general social greeting or inquiry about my status.\n5.  **Formulate a response:** Since the request is a simple social greeting, I should respond in a friendly and appropriate manner, acknowledging the greeting and stating my status (as an AI).\n6.  **Final Response Generation:** Generate a warm and helpful reply."
+              }
+            }
+          ],
+          "created": 1780202472,
+          "model": "gemma-4-E2B-it-IQ4_NL.gguf",
+          "object": "chat.completion",
+          "service_tier": null,
+          "system_fingerprint": "b9260-3a6db741a",
+          "usage": {
+            "completion_tokens": 205,
+            "prompt_tokens": 126,
+            "total_tokens": 331,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 113
+            }
+          },
+          "timings": {
+            "cache_n": 113,
+            "prompt_n": 13,
+            "prompt_ms": 149.154,
+            "prompt_per_token_ms": 11.473384615384616,
+            "prompt_per_second": 87.15823913539026,
+            "predicted_n": 205,
+            "predicted_ms": 6306.462,
+            "predicted_per_token_ms": 30.763229268292687,
+            "predicted_per_second": 32.506340322037936
           }
         }
       }

@@ -1,15 +1,13 @@
-"""Example tool definitions and test cases.
+"""Test cases and tool definitions.
 
-To add these to dataset.json, run:
-    python add_test_case.py example_tools.py
-
-This module demonstrates both the traditional TestCase construction
-and the new TestCaseBuilder approach.
+Run this file to serialize test cases to dataset.json:
+    python test_cases.py
 """
 
 from schema_gen import TestCaseBuilder, tool
 
 
+# Tool definitions
 @tool
 def get_weather(city: str, unit: str = "celsius") -> str:
     """Get the current weather for a given location."""
@@ -35,12 +33,8 @@ DEFAULT_SYSTEM = (
 )
 
 
-# ---------------------------------------------------------------------------
-# Test cases using TestCaseBuilder (recommended approach)
-# ---------------------------------------------------------------------------
-
-simple_weather = (
-    TestCaseBuilder()
+# Test cases using TestCaseBuilder
+simple_weather = (TestCaseBuilder()
     .id("simple_weather_01")
     .category("simple")
     .description("Basic single tool call with required + optional arg")
@@ -52,8 +46,7 @@ simple_weather = (
     .build()
 )
 
-parallel_search = (
-    TestCaseBuilder()
+parallel_search = (TestCaseBuilder()
     .id("parallel_search_01")
     .category("parallel")
     .description("Two independent tool calls in one turn")
@@ -70,8 +63,7 @@ parallel_search = (
     .build()
 )
 
-multiple_dependent = (
-    TestCaseBuilder()
+multiple_dependent = (TestCaseBuilder()
     .id("multiple_dependent_01")
     .category("multiple")
     .description("Sequential dependent calls (A then B, simulated in one turn)")
@@ -85,8 +77,7 @@ multiple_dependent = (
     .build()
 )
 
-refusal_greeting = (
-    TestCaseBuilder()
+refusal_greeting = (TestCaseBuilder()
     .id("refusal_greeting_01")
     .category("refusal")
     .description("No tool needed; model should answer directly")
@@ -97,3 +88,15 @@ refusal_greeting = (
     .evaluation_notes("Model must refuse to call tools and respond conversationally.")
     .build()
 )
+
+
+if __name__ == "__main__":
+    from dataset import Dataset
+
+    dataset = Dataset()
+    dataset.add(simple_weather)
+    dataset.add(parallel_search)
+    dataset.add(multiple_dependent)
+    dataset.add(refusal_greeting)
+    dataset.save()
+    print(f"Saved {len(dataset)} test cases to dataset.json")

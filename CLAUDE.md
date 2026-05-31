@@ -23,11 +23,27 @@ python run_tests.py --config config.yaml --dataset dataset.json --models qwen2.5
 python debug_single.py --model <model_name> --test-id <test_id>
 ```
 
-### Add test cases from a Python module to dataset.json
+### Create test cases interactivly
 ```bash
-python add_test_case.py my_test_cases.py
-# Overwrite existing IDs:
-python add_test_case.py my_test_cases.py --overwrite
+python create_test_case.py
+```
+
+### Create test cases with TestCaseBuilder (Python/Jupyter)
+```python
+from schema_gen import TestCaseBuilder
+test = (TestCaseBuilder()
+    .id("my_test_01")
+    .category("simple")
+    .user_message("What is the weather in Tokyo?")
+    .add_tool(get_weather)
+    .expect_tool_call(get_weather, city="Tokyo")
+    .build()
+)
+```
+
+### Serialize test cases to dataset.json
+```bash
+python test_cases.py
 ```
 
 ### Create test cases interactively
@@ -103,12 +119,13 @@ The framework has four conceptual layers that are deliberately thin:
    - Auto-injects a system message when tools are present but no system message exists in the conversation.
    - Exposes `last_payload` for debugging/logging.
 
-3. **Schema + TestCase Layer (`schema_gen.py`)**
+3. **Schema + TestCase Layer (`schema_gen.py` + `dataset.py`)**
     - `tool` decorator: no-op marker for visually identifying tool functions.
     - `get_tool_schema()`: Uses `function-schema` library to convert Python function signatures (type hints + docstrings) into OpenAI-compatible tool JSON schemas.
-    - `TestCase` class: Represents a single evaluation case with live callables for tools. `to_dict()` serializes to the JSON format expected by `dataset.json`.
+    - `TestCase` class: Represents a single evaluation case. Tools are stored as schemas (dicts) for JSON serialization. `to_dict()` serializes to the JSON format expected by `dataset.json`.
     - `TestCaseBuilder`: Fluent builder for constructing `TestCase` objects with a chainable API.
     - Helper functions: `simple_test_case()`, `refusal_test_case()`, `parallel_test_case()` for common patterns.
+    - `Dataset` class (`dataset.py`): Manages test cases with CRUD operations and JSON serialization.
 
 4. **Evaluation Layer (`evaluator.py`)**
    - `Evaluator` compares model responses to ground truth with exact-match scoring.
@@ -136,43 +153,45 @@ dataset.json (tests) ──→ client.py ──→ HTTP POST /v1/chat/completion
 |------|------|
 | `config.yaml` | Model registry: GGUF path, port, chat template, context size |
 | `dataset.json` | Ground-truth test cases (prompts + expected tool calls) |
-| `schema_gen.py` | `tool` decorator, `get_tool_schema()`, `TestCase` class |
+| `test_cases.py` | Tool definitions and test case objects (source of truth) |
+| `dataset.py` | `Dataset` class for CRUD operations on `dataset.json` |
+| `schema_gen.py` | `tool` decorator, `get_tool_schema()`, `TestCase`, `TestCaseBuilder` |
 | `server_manager.py` | `LlamaServerManager` — spawns/kills llama-server |
 | `client.py` | `LlamaClient` — raw HTTP to `/v1/chat/completions` |
 | `evaluator.py` | `Evaluator` — exact-match scoring |
 | `run_tests.py` | Orchestrator: runs all tests, writes JSON/Markdown/JSONL logs |
-| `add_test_case.py` | Ingests `TestCase` objects from Python modules into `dataset.json` |
 | `create_test_case.py` | Interactive CLI wizard for creating test cases |
 | `debug_single.py` | Runs one test case against an already-running server |
-| `example_tools.py` | Example tool definitions and sample `TestCase` objects |
 | `gemma-3-tool-template.jinja` | Custom Jinja chat template for Gemma models |
 
 ## Adding New Test Cases
 
-Define tools as annotated Python functions decorated with `@tool`, and `TestCase` objects in a `.py` file. You can use the `TestCaseBuilder` or helper functions for a more ergonomic experience:
+Define tools as annotated Python functions decorated with `@tool`, and `TestCase` objects in `test_cases.py`. This file serves as the source of truth.
 
-### Using TestCaseBuilder (recommended)
+### Using TestCaseBuilder (Recommended)
 
 ```python
-from schema_gen import TestCaseBuilder
-from example_tools import get_weather, DEFAULT_SYSTEM
+from schema_gen import TestCaseBuilder, tool
+
+@tool
+def my_tool(name: str, count: int = 1) -> str:
+    """Do something useful."""
+    pass
 
 test = (TestCaseBuilder()
     .id("my_test_01")
     .category("simple")
-    .user_message("What is the weather in Tokyo?")
-    .add_tool(get_weather)
-    .expect_tool_call(get_weather, city="Tokyo", unit="celsius")
-    .system_message(DEFAULT_SYSTEM)
+    .user_message("Run my_tool with name=foo and count=5")
+    .add_tool(my_tool)
+    .expect_tool_call(my_tool, name="foo", count=5)
     .build()
 )
 ```
 
-### Using helper functions
+### Using Helper Functions
 
 ```python
 from schema_gen import simple_test_case
-from example_tools import get_weather, DEFAULT_SYSTEM
 
 test = simple_test_case(
     id="my_test_01",
@@ -180,38 +199,25 @@ test = simple_test_case(
     question="What is the weather in Tokyo?",
     tool_callable=get_weather,
     expected_args={"city": "Tokyo", "unit": "celsius"},
-    system_message=DEFAULT_SYSTEM,
 )
 ```
 
-### Traditional way (direct TestCase construction)
+### Serialize to dataset.json
 
-```python
-from schema_gen import tool, TestCase
-
-@tool
-def my_tool(name: str, count: int = 1) -> str:
-    """Do something useful."""
-    pass
-
-my_test = TestCase(
-    id="my_test_01",
-    category="simple",
-    description="...",
-    messages=[{"role": "user", "content": "Run my_tool with name=foo and count=5"}],
-    tools=[my_tool],
-    expected={
-        "should_call_tools": True,
-        "tool_calls": [
-            {"name": "my_tool", "arguments": {"name": "foo", "count": 5}}
-        ]
-    },
-)
-```
-
-Then ingest:
+Run `test_cases.py` to serialize all test cases:
 ```bash
-python add_test_case.py my_module.py
+python test_cases.py
+```
+
+Or use the `Dataset` class programmatically:
+```python
+from dataset import Dataset
+from schema_gen import TestCaseBuilder
+
+dataset = Dataset()
+test = TestCaseBuilder().id("test_01").build()
+dataset.add(test)
+dataset.save()
 ```
 
 Or use the interactive CLI wizard:
